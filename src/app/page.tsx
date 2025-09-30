@@ -9,14 +9,16 @@ import { pokemonService, type PokemonDetailWithJapanese } from "@/services/pokem
 import type { PokemonListResponse } from "@/api/pokemon.api";
 import { Loader2 } from "lucide-react";
 import { Button } from "../components/ui/button";
+import { useSearch } from "@/contexts/SearchContext";
 
 export function ModernPokedex() {
   const [pokemonList, setPokemonList] = useState<PokemonListResponse | null>(null);
-  const [filteredPokemon, setFilteredPokemon] = useState<{name: string; url: string}[]>([]);
+  const [allLoadedPokemon, setAllLoadedPokemon] = useState<{name: string; url: string; japaneseName?: string}[]>([]);
+  const [filteredPokemon, setFilteredPokemon] = useState<{name: string; url: string; japaneseName?: string}[]>([]);
   const [selectedPokemon, setSelectedPokemon] = useState<PokemonDetailWithJapanese | null>(null);
   const [selectedPokemonUrl, setSelectedPokemonUrl] = useState<string>("");
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [searchTerm] = useState("");
+  const { searchTerm } = useSearch();
   const [loading, setLoading] = useState(true);
   const [loadingDetail, setLoadingDetail] = useState(false);
 
@@ -39,11 +41,36 @@ export function ModernPokedex() {
     loadPokemonList();
   }, []);
 
+  // ポケモンリストが更新されたら、日本語名を取得
   useEffect(() => {
-    if (pokemonList) {
-      const filtered = pokemonList.results.filter(pokemon =>
-        pokemon.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+    if (pokemonList && pokemonList.results.length > 0) {
+      const loadJapaneseNames = async () => {
+        const pokemonWithJapaneseNames = await Promise.all(
+          pokemonList.results.map(async (pokemon) => {
+            const pokemonId = pokemonService.extractIdFromResourceUrl(pokemon.url);
+            if (pokemonId) {
+              const japaneseName = await pokemonService.getPokemonNameInJapanese(pokemonId);
+              return { ...pokemon, japaneseName };
+            }
+            return pokemon;
+          })
+        );
+        setAllLoadedPokemon(pokemonWithJapaneseNames);
+      };
+      loadJapaneseNames();
+    }
+  }, [pokemonList]);
+
+  useEffect(() => {
+    if (allLoadedPokemon.length > 0) {
+      const filtered = searchTerm
+        ? allLoadedPokemon.filter(pokemon => {
+            const englishMatch = pokemon.name.toLowerCase().includes(searchTerm.toLowerCase());
+            const japaneseMatch = pokemon.japaneseName?.toLowerCase().includes(searchTerm.toLowerCase());
+            return englishMatch || japaneseMatch;
+          })
+        : allLoadedPokemon;
+
       setFilteredPokemon(filtered);
 
       // 最初のポケモンを自動選択（検索結果がある場合）
@@ -51,7 +78,7 @@ export function ModernPokedex() {
         handlePokemonSelect(filtered[0].url);
       }
     }
-  }, [pokemonList, searchTerm, selectedPokemon, handlePokemonSelect]);
+  }, [allLoadedPokemon, searchTerm, selectedPokemon, handlePokemonSelect]);
 
   const loadPokemonList = async () => {
     try {
@@ -113,6 +140,11 @@ export function ModernPokedex() {
           <div className="flex-shrink-0 px-4 py-3 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <p className="text-gray-700">
+                {searchTerm && (
+                  <span className="text-sm text-gray-500">
+                    「{searchTerm}」の検索結果:
+                  </span>
+                )}
                 {filteredPokemon.length}匹のポケモン
               </p>
               <span className="text-gray-500 text-sm">音順</span>
