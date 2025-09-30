@@ -7,7 +7,7 @@ import { PokemonHeroDisplay } from "../components/PokemonHeroDisplay";
 import { PokemonDetailModal } from "../components/PokemonDetailModal";
 import { pokemonService, type PokemonDetailWithJapanese } from "@/services/pokemonService";
 import type { PokemonListResponse } from "@/api/pokemon.api";
-import { Loader2 } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { useSearch } from "@/contexts/SearchContext";
 
@@ -18,7 +18,7 @@ export function ModernPokedex() {
   const [selectedPokemon, setSelectedPokemon] = useState<PokemonDetailWithJapanese | null>(null);
   const [selectedPokemonUrl, setSelectedPokemonUrl] = useState<string>("");
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const { searchTerm } = useSearch();
+  const { searchTerm, setSearchTerm } = useSearch();
   const [loading, setLoading] = useState(true);
   const [loadingDetail, setLoadingDetail] = useState(false);
 
@@ -139,14 +139,27 @@ export function ModernPokedex() {
         <div className="h-1/2 bg-white flex flex-col">
           <div className="flex-shrink-0 px-4 py-3 border-b border-gray-200">
             <div className="flex items-center justify-between">
-              <p className="text-gray-700">
+              <div className="flex items-center gap-2">
+                <p className="text-gray-700">
+                  {searchTerm && (
+                    <span className="text-sm text-gray-500">
+                      「{searchTerm}」の検索結果:
+                    </span>
+                  )}
+                  {filteredPokemon.length}匹のポケモン
+                </p>
                 {searchTerm && (
-                  <span className="text-sm text-gray-500">
-                    「{searchTerm}」の検索結果:
-                  </span>
+                  <Button
+                    onClick={() => setSearchTerm("")}
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 px-2 text-gray-500 hover:text-gray-700"
+                  >
+                    <X className="w-4 h-4 mr-1" />
+                    クリア
+                  </Button>
                 )}
-                {filteredPokemon.length}匹のポケモン
-              </p>
+              </div>
               <span className="text-gray-500 text-sm">音順</span>
             </div>
           </div>
