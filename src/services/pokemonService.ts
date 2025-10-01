@@ -51,24 +51,17 @@ class PokemonService {
     return pokemonAPI.getPokemonDetail(idOrName);
   }
 
-  // ポケモンの日本語名を取得（キャッシュ機能付き）
+  // TODO: 実装課題4 - 日本語名取得とキャッシュ処理
+  // ここにポケモンの日本語名を取得する処理を実装してください
+  // 要件:
+  // - キャッシュがあればそれを返す
+  // - pokemonAPI.getPokemonSpeciesを使ってspecies情報を取得
+  // - species.namesからlanguage.nameが"ja"のものを探す
+  // - 取得した結果をキャッシュに保存
+  // - エラーハンドリングを実装
   async getPokemonNameInJapanese(idOrName: string | number): Promise<string> {
-    const cached = this.nameCache.get(idOrName);
-    if (cached) return cached;
-
-    try {
-      const species = await pokemonAPI.getPokemonSpecies(idOrName);
-      const japaneseName = species.names.find(name => name.language.name === "ja")?.name;
-      const result = japaneseName || `${idOrName}`;
-
-      this.nameCache.set(idOrName, result);
-      return result;
-    } catch (error) {
-      console.error(`Failed to get Japanese name for ${idOrName}:`, error);
-      const fallback = `${idOrName}`;
-      this.nameCache.set(idOrName, fallback, 60 * 60 * 1000); // 1時間のTTL
-      return fallback;
-    }
+    // ここに実装
+    return `${idOrName}`; // 仮の返却値
   }
 
   // タイプの日本語名を取得（キャッシュ機能付き）

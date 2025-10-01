@@ -42,23 +42,13 @@ export function PokemonDetailModal({
             />
           </div>
 
-          {/* タイプ */}
-          <div className="text-center">
-            <p className="mb-2">タイプ</p>
-            <div className="flex justify-center gap-2">
-              {pokemon.types.map((typeInfo) => (
-                <Badge
-                  key={typeInfo.type.name}
-                  style={{
-                    backgroundColor: getTypeColor(typeInfo.type.name),
-                    color: "white",
-                  }}
-                >
-                  {getTypeNameInJapanese(typeInfo.type.name)}
-                </Badge>
-              ))}
-            </div>
-          </div>
+          {/* TODO: 実装課題2 - ポケモンタイプ表示UI */}
+          {/* ここにポケモンのタイプを表示するUIを実装してください */}
+          {/* 要件: */}
+          {/* - pokemon.typesをmapでループ処理 */}
+          {/* - Badgeコンポーネントを使用 */}
+          {/* - getTypeColorでタイプ別の背景色を設定 */}
+          {/* - getTypeNameInJapaneseで日本語名を表示 */}
 
           {/* 基本情報 */}
           <div className="grid grid-cols-2 gap-4 text-center">
@@ -72,28 +62,13 @@ export function PokemonDetailModal({
             </div>
           </div>
 
-          {/* ステータス */}
-          <div>
-            <p className="mb-3 text-center">ベースステータス</p>
-            <div className="space-y-3">
-              {pokemon.stats.map((stat) => {
-                const statName = getStatNameInJapanese(stat.stat.name);
-
-                return (
-                  <div key={stat.stat.name} className="space-y-1">
-                    <div className="flex justify-between">
-                      <span>{statName}</span>
-                      <span>{stat.base_stat}</span>
-                    </div>
-                    <Progress
-                      value={(stat.base_stat / getStatMaxValue(stat.stat.name)) * 100}
-                      className="h-2"
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          {/* TODO: 実装課題2 - ステータス表示UI */}
+          {/* ここにポケモンのステータスを表示するUIを実装してください */}
+          {/* 要件: */}
+          {/* - pokemon.statsをmapでループ処理 */}
+          {/* - ステータス名をgetStatNameInJapaneseで日本語化 */}
+          {/* - Progressコンポーネントでプログレスバー表示 */}
+          {/* - getStatMaxValueで最大値を取得してパーセンテージ計算 */}
         </div>
       </DialogContent>
     </Dialog>

@@ -62,22 +62,14 @@ export function ModernPokedex() {
   }, [pokemonList]);
 
   useEffect(() => {
-    if (allLoadedPokemon.length > 0) {
-      const filtered = searchTerm
-        ? allLoadedPokemon.filter(pokemon => {
-            const englishMatch = pokemon.name.toLowerCase().includes(searchTerm.toLowerCase());
-            const japaneseMatch = pokemon.japaneseName?.toLowerCase().includes(searchTerm.toLowerCase());
-            return englishMatch || japaneseMatch;
-          })
-        : allLoadedPokemon;
-
-      setFilteredPokemon(filtered);
-
-      // 最初のポケモンを自動選択（検索結果がある場合）
-      if (filtered.length > 0 && !selectedPokemon) {
-        handlePokemonSelect(filtered[0].url);
-      }
-    }
+    // TODO: 実装課題3 - 検索フィルタリング処理
+    // ここに検索フィルタリングロジックを実装してください
+    // 要件:
+    // - searchTermがある場合のみフィルタリング
+    // - 英語名（pokemon.name）と日本語名（pokemon.japaneseName）の両方で部分一致検索
+    // - 大文字小文字を区別しない
+    // - フィルタリング結果をsetFilteredPokemonで更新
+    // - 検索結果の最初のポケモンを自動選択
   }, [allLoadedPokemon, searchTerm, selectedPokemon, handlePokemonSelect]);
 
   const loadPokemonList = async () => {
@@ -97,21 +89,13 @@ export function ModernPokedex() {
   };
 
   const loadMorePokemon = async () => {
-    if (!pokemonList) return;
-
-    try {
-      setLoading(true);
-      const currentCount = pokemonList.results.length;
-      const newData = await pokemonService.getPokemonList(24, currentCount);
-      setPokemonList(prevList => ({
-        ...newData,
-        results: [...(prevList?.results || []), ...newData.results]
-      }));
-    } catch (error) {
-      console.error('追加ポケモンの取得に失敗しました:', error);
-    } finally {
-      setLoading(false);
-    }
+    // TODO: 実装課題1 - 追加読み込み機能
+    // ここに「もっと見る」ボタンクリック時の追加読み込み処理を実装してください
+    // ヒント:
+    // - 現在のポケモンリストの長さを取得
+    // - pokemonServiceを使って次の24件を取得
+    // - 既存のリストに追加
+    // - ローディング状態の管理
   };
 
   return (
@@ -139,26 +123,17 @@ export function ModernPokedex() {
         <div className="h-1/2 bg-white flex flex-col">
           <div className="flex-shrink-0 px-4 py-3 border-b border-gray-200">
             <div className="flex items-center justify-between">
+              {/* TODO: 実装課題3 - 検索結果表示とクリアボタンUI */}
+              {/* ここに検索結果の表示とクリアボタンを実装してください */}
+              {/* 要件: */}
+              {/* - searchTermがある場合は「○○の検索結果:」を表示 */}
+              {/* - フィルタリングされたポケモン数を表示 */}
+              {/* - searchTermがある場合はクリアボタンを表示 */}
+              {/* - クリアボタンクリックでsetSearchTerm("")を実行 */}
               <div className="flex items-center gap-2">
                 <p className="text-gray-700">
-                  {searchTerm && (
-                    <span className="text-sm text-gray-500">
-                      「{searchTerm}」の検索結果:
-                    </span>
-                  )}
                   {filteredPokemon.length}匹のポケモン
                 </p>
-                {searchTerm && (
-                  <Button
-                    onClick={() => setSearchTerm("")}
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 px-2 text-gray-500 hover:text-gray-700"
-                  >
-                    <X className="w-4 h-4 mr-1" />
-                    クリア
-                  </Button>
-                )}
               </div>
               <span className="text-gray-500 text-sm">音順</span>
             </div>
@@ -182,25 +157,12 @@ export function ModernPokedex() {
                     />
                   ))}
 
-                  {/* もっと読み込むボタン */}
-                  {pokemonList && pokemonList.results.length < 151 && (
-                    <div className="text-center pt-4">
-                      <Button
-                        onClick={loadMorePokemon}
-                        disabled={loading}
-                        className="bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-300"
-                      >
-                        {loading ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                            読み込み中...
-                          </>
-                        ) : (
-                          'もっと見る'
-                        )}
-                      </Button>
-                    </div>
-                  )}
+                  {/* TODO: 実装課題1 - もっと見るボタンUI */}
+                  {/* ここに「もっと見る」ボタンのUIを実装してください */}
+                  {/* 要件: */}
+                  {/* - 151匹未満の場合のみ表示 */}
+                  {/* - ローディング中は「読み込み中...」とスピナーを表示 */}
+                  {/* - loadMorePokemon関数を呼び出す */}
                 </>
               )}
 

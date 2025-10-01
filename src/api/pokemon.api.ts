@@ -67,9 +67,15 @@ class PokemonAPIClient {
     }
   }
 
+  // TODO: 実装課題5 - API通信処理
+  // ここにポケモンリストを取得するAPI通信処理を実装してください
+  // 要件:
+  // - URLSearchParamsでlimitとoffsetをクエリパラメータに変換
+  // - fetchAPIメソッドを使って/pokemonエンドポイントへリクエスト
+  // - PokemonListResponse型を返す
   async getPokemonList(limit: number, offset: number): Promise<PokemonListResponse> {
-    const qs = new URLSearchParams({ limit: String(limit), offset: String(offset) });
-    return this.fetchAPI<PokemonListResponse>(`/pokemon?${qs.toString()}`);
+    // ここに実装
+    throw new Error('未実装');
   }
 
   async getPokemonDetail(idOrName: string | number): Promise<PokemonDetail> {
