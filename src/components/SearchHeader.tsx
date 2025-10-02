@@ -9,19 +9,20 @@ export function SearchHeader() {
 
   return (
     <>
-      <button
-        onClick={() => setIsSearchModalOpen(true)}
-        className="text-white hover:bg-white/10 p-2 rounded-lg transition-colors"
-        aria-label="検索"
-      >
-        <Search className="w-6 h-6" />
-      </button>
+      {/* TODO: 実装課題6 - 検索アイコンボタン */}
+      {/* ここに検索アイコンボタンを実装してください */}
+      {/* 要件: */}
+      {/* - Searchアイコン（lucide-react）を表示 */}
+      {/* - クリックでsetIsSearchModalOpen(true)を呼ぶ */}
+      {/* - aria-label="検索"を設定 */}
+      {/* - ホバー時の背景色変更エフェクト */}
 
-      <SearchModal
-        open={isSearchModalOpen}
-        onOpenChange={setIsSearchModalOpen}
-        onSearch={setSearchTerm}
-      />
+      {/* TODO: 実装課題6 - SearchModalコンポーネントの配置 */}
+      {/* ここにSearchModalコンポーネントを配置してください */}
+      {/* 要件: */}
+      {/* - open={isSearchModalOpen} */}
+      {/* - onOpenChange={setIsSearchModalOpen} */}
+      {/* - onSearch={setSearchTerm} */}
     </>
   );
 }

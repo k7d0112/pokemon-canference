@@ -20,23 +20,32 @@ interface SearchModalProps {
 export function SearchModal({ open, onOpenChange, onSearch }: SearchModalProps) {
   const [searchTerm, setSearchTerm] = useState("");
 
+  // TODO: 実装課題6 - 検索実行処理
+  // ここに検索実行の処理を実装してください
+  // 要件:
+  // - searchTerm.trim()が空でない場合のみ実行
+  // - onSearch(searchTerm.trim())を呼ぶ
+  // - setSearchTerm("")で入力をクリア
+  // - onOpenChange(false)でモーダルを閉じる
   const handleSearch = () => {
-    if (searchTerm.trim()) {
-      onSearch(searchTerm.trim());
-      setSearchTerm("");
-      onOpenChange(false);
-    }
+    // ここに実装
   };
 
+  // TODO: 実装課題6 - Enterキー処理
+  // ここにEnterキーが押された時の処理を実装してください
+  // 要件:
+  // - e.key === "Enter"の場合にhandleSearch()を呼ぶ
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
+    // ここに実装
   };
 
+  // TODO: 実装課題6 - キャンセル処理
+  // ここにキャンセルボタンの処理を実装してください
+  // 要件:
+  // - setSearchTerm("")で入力をクリア
+  // - onOpenChange(false)でモーダルを閉じる
   const handleClose = () => {
-    setSearchTerm("");
-    onOpenChange(false);
+    // ここに実装
   };
 
   return (
@@ -49,35 +58,27 @@ export function SearchModal({ open, onOpenChange, onSearch }: SearchModalProps) 
           </DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          <div className="flex items-center gap-2">
-            <Input
-              id="search"
-              placeholder="ポケモン名を入力..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="flex-1"
-              autoFocus
-            />
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button
-              variant="outline"
-              onClick={handleClose}
-              className="gap-2"
-            >
-              <X className="h-4 w-4" />
-              キャンセル
-            </Button>
-            <Button
-              onClick={handleSearch}
-              disabled={!searchTerm.trim()}
-              className="gap-2"
-            >
-              <Search className="h-4 w-4" />
-              検索
-            </Button>
-          </div>
+          {/* TODO: 実装課題6 - 検索入力フィールド */}
+          {/* ここに検索入力フィールドを実装してください */}
+          {/* 要件: */}
+          {/* - Inputコンポーネントを使用 */}
+          {/* - placeholder="ポケモン名を入力..." */}
+          {/* - value={searchTerm} */}
+          {/* - onChange={(e) => setSearchTerm(e.target.value)} */}
+          {/* - onKeyDown={handleKeyDown} */}
+          {/* - autoFocusを設定 */}
+
+          {/* TODO: 実装課題6 - ボタン群 */}
+          {/* ここにキャンセルボタンと検索ボタンを実装してください */}
+          {/* 要件: */}
+          {/* キャンセルボタン: */}
+          {/* - variant="outline" */}
+          {/* - onClick={handleClose} */}
+          {/* - Xアイコン付き */}
+          {/* 検索ボタン: */}
+          {/* - onClick={handleSearch} */}
+          {/* - disabled={!searchTerm.trim()} */}
+          {/* - Searchアイコン付き */}
         </div>
       </DialogContent>
     </Dialog>
