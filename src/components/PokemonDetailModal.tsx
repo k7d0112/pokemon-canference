@@ -42,11 +42,6 @@ export function PokemonDetailModal({
             />
           </div>
 
-          {/* TODO: 実装課題2 - ポケモン詳細表示UI */}
-          {/* 以下の2つのUIを実装してください： */}
-          {/* 1. タイプ表示: pokemon.typesをBadgeコンポーネントで表示 */}
-          {/* 2. ステータス表示: pokemon.statsをProgressコンポーネントで表示 */}
-
           {/* 基本情報 */}
           <div className="grid grid-cols-2 gap-4 text-center">
             <div>
