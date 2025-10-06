@@ -22,11 +22,17 @@ export function ModernPokedex() {
   const [loading, setLoading] = useState(true);
   const [loadingDetail, setLoadingDetail] = useState(false);
 
-  // TODO: 実装課題3 - ポケモン詳細取得
-  // リストからポケモンを選択した時の詳細情報取得処理を実装
+  // 実装課題1のみでも動作するように、簡易版の選択処理を先行実装
   const handlePokemonSelect = useCallback(async (pokemonUrl: string) => {
-    // 詳細取得処理をここに実装
+    // 簡易版: URLを保存して選択状態のみ管理
+    setSelectedPokemonUrl(pokemonUrl);
+    // 詳細データは後で取得するように空にしておく
+    setSelectedPokemon(null);
   }, []);
+
+  // TODO: 実装課題3 - 高度なポケモン詳細取得
+  // APIから詳細データを取得して表示する処理を実装
+  // ここに高度な詳細取得処理を実装
 
   useEffect(() => {
     loadPokemonList();
@@ -51,11 +57,26 @@ export function ModernPokedex() {
       loadJapaneseNames();
     }
   }, [pokemonList]);
-
-  // TODO: 実装課題4 - 検索フィルタリング
-  // 検索ワードに基づくポケモンリストのフィルタリング処理を実装
+  console.log("filteredPokemon", filteredPokemon)
+  // 実装課題1のみでも動作するように、簡易版のフィルタリングを先行実装
   useEffect(() => {
-    // フィルタリング処理をここに実装
+    if (pokemonList && pokemonList.results.length > 0) {
+      // 簡易版: allLoadedPokemonがなくても動作する
+      const pokemonWithSimpleFilter = pokemonList.results;
+      setFilteredPokemon(pokemonWithSimpleFilter);
+
+      // 最初のポケモンを自動選択
+      if (pokemonWithSimpleFilter.length > 0 && !selectedPokemon) {
+        handlePokemonSelect(pokemonWithSimpleFilter[0].url);
+      }
+    }
+  }, [pokemonList, selectedPokemon, handlePokemonSelect]);
+
+  // TODO: 実装課題4 - 高度な検索フィルタリング
+  // 日本語・英語名での部分一致検索機能を実装
+  useEffect(() => {
+    // ここに検索フィルタリング処理を実装
+    // allLoadedPokemonとsearchTermを使った高度なフィルタリング
   }, [allLoadedPokemon, searchTerm, selectedPokemon, handlePokemonSelect]);
 
   // TODO: 実装課題1 - ポケモン一覧の取得と追加読み込み
@@ -63,6 +84,10 @@ export function ModernPokedex() {
   // 1. loadPokemonList: 初期表示時に24件のポケモンを取得
   // 2. loadMorePokemon: 「もっと見る」ボタンで追加24件を取得
 
+  // TODO: 実装課題1 - ポケモン一覧の取得と追加読み込み
+  // 以下の2つの関数を実装してください：
+  // 1. loadPokemonList: 初期表示時に24件のポケモンを取得
+  // 2. loadMorePokemon: 「もっと見る」ボタンで追加24件を取得
   const loadPokemonList = async () => {
     // 初期ロード処理をここに実装
   };

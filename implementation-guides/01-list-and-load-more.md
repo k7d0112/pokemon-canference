@@ -3,8 +3,8 @@
 ## Claude Codeへの実装プロンプト
 
 ```
-ポケモン図鑑アプリの一覧表示と追加読み込み機能を実装してください。
-初期表示で24件、「もっと見る」ボタンで追加24件ずつ読み込む機能です。
+ポケモン図鑑アプリの基本的な一覧表示機能を実装してください。
+この課題を完了すると、基本的なポケモン図鑑として動作するようになります。
 
 ## 実装場所
 - ファイル: src/app/page.tsx
@@ -14,122 +14,157 @@
   3. 「もっと見る」ボタンUI
 
 ## 機能要件
-1. アプリ起動時に自動的に最初の24件を取得して表示
-2. 「もっと見る」ボタンクリックで追加24件を既存リストに追加
-3. 最大151匹（第1世代）まで読み込み可能
-4. ローディング中はボタンを無効化し、スピナーを表示
+1. アプリ起動時に自動的に最初の24件のポケモンを取得して一覧表示
+2. ポケモンをクリックすると選択状態が変わる（基本的な選択機能）
+3. 「もっと見る」ボタンで追加24件を既存リストに追加表示
+4. 最大151匹（第1世代）まで読み込み可能
+5. ローディング中は適切なUI表示
+
+## 完了後の動作
+- ✅ ポケモンリストが24件表示される
+- ✅ リスト項目をクリックして選択できる
+- ✅ 「もっと見る」で追加読み込みができる
+- ✅ 基本的なポケモン図鑑として機能する
 
 ## 実装仕様
 
 ### Part 1: loadPokemonList関数（初期読み込み）
 
-#### 処理フロー
-1. **非同期処理の実装**
-   - async/awaitパターンを使用
-   - try-catch-finallyで適切なエラーハンドリング
+#### 処理要件
+アプリケーション起動時に呼ばれる関数で、最初の24件のポケモンデータを取得します。
 
-2. **実装手順**
-   - tryブロック開始
-   - setLoading(true)でローディング開始
-   - pokemonService.getPokemonList(24, 0)でデータ取得
-     - 第1引数: 取得件数（24）
-     - 第2引数: 開始位置（0）
-   - 取得したデータをsetPokemonList(data)で保存
+#### 実装手順
+1. **非同期関数として実装**
+   - async/await パターンを使用して実装してください
 
-3. **エラーハンドリング**
-   - catchブロックでエラーキャッチ
-   - console.error('ポケモンリストの取得に失敗しました:!!!!', error)
-   - エラーでもアプリは継続動作
+2. **エラーハンドリング付きの処理**
+   - try-catch-finally構文を使用
+   - tryブロック内で以下を実装:
+     - setLoading(true)でローディング状態を開始
+     - pokemonService.getPokemonList(24, 0)でポケモンデータを取得
+       - 第1引数: 取得件数（24件）
+       - 第2引数: 開始位置（0番目から）
+     - 取得したデータをsetPokemonList(data)でstateに保存
+
+3. **エラー処理**
+   - catchブロックで以下を実装:
+     - console.error('ポケモンリストの取得に失敗しました:!!!!', error)でエラーログ出力
+     - エラーが発生してもアプリケーションは継続動作
 
 4. **後処理**
-   - finallyブロックでsetLoading(false)
-   - 成功・失敗に関わらず必ずローディング解除
+   - finallyブロックでsetLoading(false)を実行
+   - 成功・失敗に関わらず必ずローディング状態を解除
 
 ### Part 2: loadMorePokemon関数（追加読み込み）
 
-#### 処理フロー
-1. **前提条件**
-   - if (!pokemonList) return;で早期リターン
-   - データがない場合は処理しない
+#### 処理要件
+「もっと見る」ボタンがクリックされた時に呼ばれる関数で、次の24件を追加取得します。
 
-2. **実装手順**
-   - tryブロック開始
-   - setLoading(true)でローディング開始
-   - 現在の件数を取得: const currentCount = pokemonList.results.length
-   - pokemonService.getPokemonList(24, currentCount)で追加データ取得
-     - offsetに現在の件数を指定
+#### 実装手順
+1. **前提条件の確認**
+   - if (!pokemonList) return; で早期リターン
+   - 初期データがない場合は処理を行わない
+
+2. **追加データの取得処理**
+   - tryブロック内で以下を実装:
+     - setLoading(true)でローディング状態開始
+     - const currentCount = pokemonList.results.length で現在の件数を取得
+     - pokemonService.getPokemonList(24, currentCount)で追加データを取得
+       - 第1引数: 取得件数（24件）
+       - 第2引数: 現在の件数（続きから取得するため）
 
 3. **データマージ処理**
-   - setPokemonListで既存と新規データを結合
-   - 関数型更新を使用: setPokemonList(prevList => ...)
-   - 返すオブジェクト:
+   - setPokemonListで既存データと新規データを結合
+   - 関数型更新パターンを使用: setPokemonList(prevList => ...)
+   - 結合オブジェクトの構造:
      ```javascript
      {
-       ...newData, // メタ情報（next, previousなど）を更新
-       results: [...(prevList?.results || []), ...newData.results] // 配列結合
+       ...newData, // APIレスポンスのメタ情報（next, previousなど）を更新
+       results: [...(prevList?.results || []), ...newData.results] // 既存配列と新規配列を結合
      }
      ```
 
-4. **エラーハンドリング**
-   - catchブロックでエラーキャッチ
-   - console.error('追加ポケモンの取得に失敗しました:', error)
-
-5. **後処理**
-   - finallyブロックでsetLoading(false)
+4. **エラー処理と後処理**
+   - catchブロック: console.error('追加ポケモンの取得に失敗しました:', error)
+   - finallyブロック: setLoading(false)
 
 ### Part 3: 「もっと見る」ボタンUI
 
-#### 実装要件
-1. **表示条件（AND条件）**
-   - pokemonListが存在する
-   - pokemonList.results.length < 151
+#### 表示要件
+以下の条件を満たす場合のみボタンを表示してください：
+- pokemonListが存在する（データが読み込まれている）
+- pokemonList.results.lengthが151未満（まだ追加読み込み可能）
 
-2. **UI構造**
-   ```jsx
-   {pokemonList && pokemonList.results.length < 151 && (
-     <div className="text-center pt-4">
-       <Button
-         onClick={loadMorePokemon}
-         disabled={loading}
-         className="bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-300"
-       >
-         {/* ボタンの中身 */}
-       </Button>
-     </div>
-   )}
-   ```
+#### UI実装仕様
 
-3. **ボタンの中身**
-   - loading時:
-     ```jsx
-     <>
-       <Loader2 className="w-4 h-4 animate-spin mr-2" />
-       読み込み中...
-     </>
-     ```
-   - 通常時:
-     ```jsx
-     'もっと見る'
-     ```
+**全体の構造:**
+```jsx
+{pokemonList && pokemonList.results.length < 151 && (
+  <div className="text-center pt-4">
+    <Button
+      onClick={loadMorePokemon}
+      disabled={loading}
+      className="bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-300"
+    >
+      {/* ボタンの中身を条件分岐で表示 */}
+    </Button>
+  </div>
+)}
+```
 
-## 使用する要素
-- pokemonService: APIとの通信サービス
-- setLoading/loading: ローディング状態管理
-- setPokemonList/pokemonList: ポケモンリスト管理
-- Button: shadcn/uiのボタンコンポーネント
-- Loader2: lucide-reactのローディングアイコン
+**ボタンの表示内容:**
+- **ローディング中の場合:**
+  ```jsx
+  <>
+    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+    読み込み中...
+  </>
+  ```
 
-## 実装のポイント
-- スプレッド演算子（...）を使った配列・オブジェクトの結合
-- オプショナルチェーン（?.）でnullチェック
-- 関数型更新でprevListを使った安全な更新
-- 条件付きレンダリング（&&）の活用
+- **通常時の場合:**
+  ```jsx
+  'もっと見る'
+  ```
 
-## 動作確認
-1. ページ読み込み時に24件表示されることを確認
-2. 「もっと見る」ボタンが表示されることを確認
-3. ボタンクリックで追加24件が表示されることを確認
-4. ローディング中はボタンが無効化され、スピナーが回ることを確認
-5. 151件に達したらボタンが消えることを確認
-6. コンソールにエラーが出ていないことを確認
+**重要なポイント:**
+- onClick={loadMorePokemon}でクリック時の処理を設定
+- disabled={loading}でローディング中はボタンを無効化
+- 条件分岐でローディング状態に応じた表示を切り替え
+
+## 使用する要素の説明
+- **pokemonService**: APIとの通信を行うサービス（既に用意済み）
+- **setLoading/loading**: ローディング状態を管理するstate
+- **setPokemonList/pokemonList**: ポケモンリストデータを管理するstate
+- **Button**: shadcn/uiのボタンコンポーネント（既にインポート済み）
+- **Loader2**: lucide-reactのローディングアイコン（既にインポート済み）
+
+## 実装時の注意点
+- スプレッド演算子（...）を使った配列とオブジェクトの適切な結合
+- オプショナルチェーン（?.）を使った安全なプロパティアクセス
+- 関数型更新でprevListを使用した安全なstate更新
+- 条件付きレンダリング（&&演算子）の適切な使用
+
+## 動作確認手順
+この実装が完了したら、以下を確認してください：
+
+1. **初期表示の確認**
+   - ブラウザでアプリを開く
+   - 自動的に24件のポケモンが一覧表示されることを確認
+
+2. **選択機能の確認**
+   - リスト内のポケモンをクリック
+   - 選択したポケモンがハイライト表示されることを確認
+
+3. **追加読み込みの確認**
+   - 「もっと見る」ボタンが表示されることを確認
+   - ボタンをクリックして追加24件が表示されることを確認
+   - ローディング中はボタンが無効化され、スピナーが表示されることを確認
+
+4. **上限の確認**
+   - 151件に達したらボタンが消えることを確認
+
+5. **エラーがないことの確認**
+   - 開発者ツールのコンソールにエラーが出ていないことを確認
+
+完了後、基本的なポケモン図鑑として動作するようになります！
 ```
