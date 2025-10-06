@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import { ScrollArea } from "../components/ui/scroll-area";
 import { PokemonListItem } from "../components/PokemonListItem";
 import { PokemonHeroDisplay } from "../components/PokemonHeroDisplay";
-import { PokemonDetailModal } from "../components/PokemonDetailModal";
 import { pokemonService, type PokemonDetailWithJapanese } from "@/services/pokemonService";
 import type { PokemonListResponse } from "@/api/pokemon.api";
 import { Loader2, X } from "lucide-react";
@@ -17,20 +16,15 @@ export function ModernPokedex() {
   const [filteredPokemon, setFilteredPokemon] = useState<{name: string; url: string; japaneseName?: string}[]>([]);
   const [selectedPokemon, setSelectedPokemon] = useState<PokemonDetailWithJapanese | null>(null);
   const [selectedPokemonUrl, setSelectedPokemonUrl] = useState<string>("");
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const { searchTerm, setSearchTerm } = useSearch();
   const [loading, setLoading] = useState(false);
   const [loadingDetail, setLoadingDetail] = useState(false);
 
-  // TODO: 実装課題3 - ポケモン詳細取得
-  // ポケモンをクリックした時に詳細情報を取得する処理を実装
+  // TODO: 実装課題3 - 詳細表示（モーダルなし）
+  // ポケモンをクリックした時にメイン画面に詳細を表示する処理を実装
   const handlePokemonSelect = useCallback(async (pokemonUrl: string) => {
-    // ここに詳細取得処理を実装
+    // ここに詳細取得・表示処理を実装
   }, []);
-
-  // TODO: 実装課題3 - 高度なポケモン詳細取得
-  // APIから詳細データを取得して表示する処理を実装
-  // ここに高度な詳細取得処理を実装
 
   useEffect(() => {
     loadPokemonList();
@@ -56,37 +50,39 @@ export function ModernPokedex() {
     }
   }, [pokemonList]);
 
-  // TODO: 実装課題4 - 高度な検索フィルタリング
+  // TODO: 実装課題1 - 基本フィルタリング処理
+  // ポケモンリストから表示用のリストを作成
+  useEffect(() => {
+    if (pokemonList && pokemonList.results.length > 0) {
+      const loadJapaneseNames = async () => {
+        const pokemonWithJapaneseNames = await Promise.all(
+          pokemonList.results.map(async (pokemon) => {
+            const pokemonId = pokemonService.extractIdFromResourceUrl(pokemon.url);
+            if (pokemonId) {
+              const japaneseName = await pokemonService.getPokemonNameInJapanese(pokemonId);
+              return { ...pokemon, japaneseName };
+            }
+            return pokemon;
+          })
+        );
+        setAllLoadedPokemon(pokemonWithJapaneseNames);
+      };
+      loadJapaneseNames();
+    }
+  }, [pokemonList]);
+
+  // TODO: 実装課題4 - 検索機能実装
   // 日本語・英語名での部分一致検索機能を実装
   useEffect(() => {
+    // ここに検索フィルタリング処理を実装
     if (allLoadedPokemon.length > 0) {
-      const filtered = searchTerm
-        ? allLoadedPokemon.filter(pokemon => {
-            const englishMatch = pokemon.name.toLowerCase().includes(searchTerm.toLowerCase());
-            const japaneseMatch = pokemon.japaneseName?.toLowerCase().includes(searchTerm.toLowerCase());
-            return englishMatch || japaneseMatch;
-          })
-        : allLoadedPokemon;
 
-      setFilteredPokemon(filtered);
-
-      // 最初のポケモンを自動選択（検索結果がある場合）
-      if (filtered.length > 0 && !selectedPokemon) {
-        handlePokemonSelect(filtered[0].url);
-      }
+      setFilteredPokemon(allLoadedPokemon);
     }
-  }, [allLoadedPokemon, searchTerm, selectedPokemon, handlePokemonSelect]);
+  }, [allLoadedPokemon, searchTerm]);
 
-  // TODO: 実装課題1 - ポケモン一覧の取得と追加読み込み
-  // 以下の2つの関数を実装してください：
-  // 1. loadPokemonList: 初期表示時に24件のポケモンを取得
-  // 2. loadMorePokemon: 「もっと見る」ボタンで追加24件を取得
-
-  // TODO: 実装課題1 - ポケモン一覧の取得と追加読み込み
-  // 以下の2つの関数を実装してください：
-  // 1. loadPokemonList: 初期表示時に24件のポケモンを取得
-  // 2. loadMorePokemon: 「もっと見る」ボタンで追加24件を取得
-  // TODO: 実装課題1 - ポケモン一覧の初期取得
+  // TODO: 実装課題1 - リスト取得、表示
+  // 初期表示時に24件のポケモンを取得する処理を実装
   const loadPokemonList = async () => {
     try {
       setLoading(true);
@@ -99,27 +95,11 @@ export function ModernPokedex() {
     }
   };
 
-  const handleInfoClick = () => {
-    setIsDetailModalOpen(true);
-  };
 
-  // TODO: 実装課題1 - 追加読み込み処理
+  // TODO: 実装課題2 - 追加読み込み実装
+  // 「もっと見る」ボタンで追加24件を取得する処理を実装
   const loadMorePokemon = async () => {
-    if (!pokemonList) return;
-
-    try {
-      setLoading(true);
-      const currentCount = pokemonList.results.length;
-      const newData = await pokemonService.getPokemonList(24, currentCount);
-      setPokemonList(prevList => ({
-        ...newData,
-        results: [...(prevList?.results || []), ...newData.results]
-      }));
-    } catch (error) {
-      console.error('追加ポケモンの取得に失敗しました:', error);
-    } finally {
-      setLoading(false);
-    }
+    // ここに追加読み込み処理を実装
   };
 
   return (
@@ -138,7 +118,6 @@ export function ModernPokedex() {
           ) : (
             <PokemonHeroDisplay
               pokemon={selectedPokemon}
-              onInfoClick={handleInfoClick}
             />
           )}
         </div>
@@ -190,23 +169,8 @@ export function ModernPokedex() {
                     />
                   ))}
 
-                  {/* TODO: 実装課題1 - もっと見るボタンUI */}
-                  <div className="text-center pt-4">
-                      <Button
-                        onClick={loadMorePokemon}
-                        disabled={loading}
-                        className="bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-300"
-                      >
-                        {loading ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                            読み込み中...
-                          </>
-                        ) : (
-                          'もっと見る'
-                        )}
-                      </Button>
-                    </div>
+                  {/* TODO: 実装課題2 - もっと見るボタンUI */}
+                  {/* ここに「もっと見る」ボタンを実装 */}
                 </>
               )}
 
@@ -221,12 +185,6 @@ export function ModernPokedex() {
         </div>
       </div>
 
-      {/* ポケモン詳細モーダル */}
-      <PokemonDetailModal
-        pokemon={selectedPokemon}
-        isOpen={isDetailModalOpen}
-        onClose={() => setIsDetailModalOpen(false)}
-      />
     </div>
   );
 }
