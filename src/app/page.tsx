@@ -22,19 +22,10 @@ export function ModernPokedex() {
   const [loading, setLoading] = useState(true);
   const [loadingDetail, setLoadingDetail] = useState(false);
 
+  // TODO: 実装課題3 - ポケモン詳細取得
+  // リストからポケモンを選択した時の詳細情報取得処理を実装
   const handlePokemonSelect = useCallback(async (pokemonUrl: string) => {
-    try {
-      setLoadingDetail(true);
-      setSelectedPokemonUrl(pokemonUrl);
-      const pokemonId = pokemonService.extractIdFromResourceUrl(pokemonUrl);
-      if (!pokemonId) throw new Error('Invalid Pokemon URL');
-      const pokemonDetail = await pokemonService.getPokemonDetailWithJapaneseName(pokemonId);
-      setSelectedPokemon(pokemonDetail);
-    } catch (error) {
-      console.error('ポケモン詳細の取得に失敗しました:', error);
-    } finally {
-      setLoadingDetail(false);
-    }
+    // 詳細取得処理をここに実装
   }, []);
 
   useEffect(() => {
@@ -61,35 +52,19 @@ export function ModernPokedex() {
     }
   }, [pokemonList]);
 
+  // TODO: 実装課題4 - 検索フィルタリング
+  // 検索ワードに基づくポケモンリストのフィルタリング処理を実装
   useEffect(() => {
-    if (allLoadedPokemon.length > 0) {
-      const filtered = searchTerm
-        ? allLoadedPokemon.filter(pokemon => {
-            const englishMatch = pokemon.name.toLowerCase().includes(searchTerm.toLowerCase());
-            const japaneseMatch = pokemon.japaneseName?.toLowerCase().includes(searchTerm.toLowerCase());
-            return englishMatch || japaneseMatch;
-          })
-        : allLoadedPokemon;
-
-      setFilteredPokemon(filtered);
-
-      // 最初のポケモンを自動選択（検索結果がある場合）
-      if (filtered.length > 0 && !selectedPokemon) {
-        handlePokemonSelect(filtered[0].url);
-      }
-    }
+    // フィルタリング処理をここに実装
   }, [allLoadedPokemon, searchTerm, selectedPokemon, handlePokemonSelect]);
 
+  // TODO: 実装課題1 - ポケモン一覧の取得と追加読み込み
+  // 以下の2つの関数を実装してください：
+  // 1. loadPokemonList: 初期表示時に24件のポケモンを取得
+  // 2. loadMorePokemon: 「もっと見る」ボタンで追加24件を取得
+
   const loadPokemonList = async () => {
-    try {
-      setLoading(true);
-      const data = await pokemonService.getPokemonList(24, 0); // 適切な数のポケモンを読み込み
-      setPokemonList(data);
-    } catch (error) {
-      console.error('ポケモンリストの取得に失敗しました:!!!!', error);
-    } finally {
-      setLoading(false);
-    }
+    // 初期ロード処理をここに実装
   };
 
   const handleInfoClick = () => {
@@ -97,21 +72,7 @@ export function ModernPokedex() {
   };
 
   const loadMorePokemon = async () => {
-    if (!pokemonList) return;
-
-    try {
-      setLoading(true);
-      const currentCount = pokemonList.results.length;
-      const newData = await pokemonService.getPokemonList(24, currentCount);
-      setPokemonList(prevList => ({
-        ...newData,
-        results: [...(prevList?.results || []), ...newData.results]
-      }));
-    } catch (error) {
-      console.error('追加ポケモンの取得に失敗しました:', error);
-    } finally {
-      setLoading(false);
-    }
+    // 追加読み込み処理をここに実装
   };
 
   return (
@@ -182,25 +143,9 @@ export function ModernPokedex() {
                     />
                   ))}
 
-                  {/* もっと読み込むボタン */}
-                  {pokemonList && pokemonList.results.length < 151 && (
-                    <div className="text-center pt-4">
-                      <Button
-                        onClick={loadMorePokemon}
-                        disabled={loading}
-                        className="bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-300"
-                      >
-                        {loading ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                            読み込み中...
-                          </>
-                        ) : (
-                          'もっと見る'
-                        )}
-                      </Button>
-                    </div>
-                  )}
+                  {/* TODO: 実装課題1 - もっと見るボタンUI */}
+                  {/* 「もっと見る」ボタンのUIを実装 */}
+                  {/* 要件: 151匹未満の場合のみ表示、ローディング中は無効化 */}
                 </>
               )}
 

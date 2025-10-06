@@ -42,23 +42,10 @@ export function PokemonDetailModal({
             />
           </div>
 
-          {/* タイプ */}
-          <div className="text-center">
-            <p className="mb-2">タイプ</p>
-            <div className="flex justify-center gap-2">
-              {pokemon.types.map((typeInfo) => (
-                <Badge
-                  key={typeInfo.type.name}
-                  style={{
-                    backgroundColor: getTypeColor(typeInfo.type.name),
-                    color: "white",
-                  }}
-                >
-                  {getTypeNameInJapanese(typeInfo.type.name)}
-                </Badge>
-              ))}
-            </div>
-          </div>
+          {/* TODO: 実装課題2 - ポケモン詳細表示UI */}
+          {/* 以下の2つのUIを実装してください： */}
+          {/* 1. タイプ表示: pokemon.typesをBadgeコンポーネントで表示 */}
+          {/* 2. ステータス表示: pokemon.statsをProgressコンポーネントで表示 */}
 
           {/* 基本情報 */}
           <div className="grid grid-cols-2 gap-4 text-center">
@@ -69,29 +56,6 @@ export function PokemonDetailModal({
             <div>
               <p className="text-muted-foreground">体重</p>
               <p>{(pokemon.weight / 10).toFixed(1)} kg</p>
-            </div>
-          </div>
-
-          {/* ステータス */}
-          <div>
-            <p className="mb-3 text-center">ベースステータス</p>
-            <div className="space-y-3">
-              {pokemon.stats.map((stat) => {
-                const statName = getStatNameInJapanese(stat.stat.name);
-
-                return (
-                  <div key={stat.stat.name} className="space-y-1">
-                    <div className="flex justify-between">
-                      <span>{statName}</span>
-                      <span>{stat.base_stat}</span>
-                    </div>
-                    <Progress
-                      value={(stat.base_stat / getStatMaxValue(stat.stat.name)) * 100}
-                      className="h-2"
-                    />
-                  </div>
-                );
-              })}
             </div>
           </div>
         </div>

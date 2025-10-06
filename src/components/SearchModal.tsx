@@ -20,23 +20,22 @@ interface SearchModalProps {
 export function SearchModal({ open, onOpenChange, onSearch }: SearchModalProps) {
   const [searchTerm, setSearchTerm] = useState("");
 
+  // TODO: 実装課題4 - 検索モーダルの処理関数
+  // 以下の3つの関数を実装してください：
+  // 1. handleSearch: 検索実行処理
+  // 2. handleKeyDown: Enterキーで検索実行
+  // 3. handleClose: モーダルを閉じる処理
+
   const handleSearch = () => {
-    if (searchTerm.trim()) {
-      onSearch(searchTerm.trim());
-      setSearchTerm("");
-      onOpenChange(false);
-    }
+    // 検索実行処理
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
+    // Enterキー処理
   };
 
   const handleClose = () => {
-    setSearchTerm("");
-    onOpenChange(false);
+    // キャンセル処理
   };
 
   return (
@@ -49,35 +48,9 @@ export function SearchModal({ open, onOpenChange, onSearch }: SearchModalProps) 
           </DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          <div className="flex items-center gap-2">
-            <Input
-              id="search"
-              placeholder="ポケモン名を入力..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="flex-1"
-              autoFocus
-            />
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button
-              variant="outline"
-              onClick={handleClose}
-              className="gap-2"
-            >
-              <X className="h-4 w-4" />
-              キャンセル
-            </Button>
-            <Button
-              onClick={handleSearch}
-              disabled={!searchTerm.trim()}
-              className="gap-2"
-            >
-              <Search className="h-4 w-4" />
-              検索
-            </Button>
-          </div>
+          {/* TODO: 実装課題4 - 検索UI */}
+          {/* 検索入力フィールドとボタンを実装 */}
+          {/* InputコンポーネントとButtonコンポーネントを使用 */}
         </div>
       </DialogContent>
     </Dialog>
