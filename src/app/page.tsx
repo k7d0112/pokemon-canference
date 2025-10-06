@@ -19,15 +19,13 @@ export function ModernPokedex() {
   const [selectedPokemonUrl, setSelectedPokemonUrl] = useState<string>("");
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const { searchTerm, setSearchTerm } = useSearch();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [loadingDetail, setLoadingDetail] = useState(false);
 
-  // 実装課題1のみでも動作するように、簡易版の選択処理を先行実装
+  // TODO: 実装課題3 - ポケモン詳細取得
+  // ポケモンをクリックした時に詳細情報を取得する処理を実装
   const handlePokemonSelect = useCallback(async (pokemonUrl: string) => {
-    // 簡易版: URLを保存して選択状態のみ管理
-    setSelectedPokemonUrl(pokemonUrl);
-    // 詳細データは後で取得するように空にしておく
-    setSelectedPokemon(null);
+    // ここに詳細取得処理を実装
   }, []);
 
   // TODO: 実装課題3 - 高度なポケモン詳細取得
@@ -57,26 +55,26 @@ export function ModernPokedex() {
       loadJapaneseNames();
     }
   }, [pokemonList]);
-  console.log("filteredPokemon", filteredPokemon)
-  // 実装課題1のみでも動作するように、簡易版のフィルタリングを先行実装
-  useEffect(() => {
-    if (pokemonList && pokemonList.results.length > 0) {
-      // 簡易版: allLoadedPokemonがなくても動作する
-      const pokemonWithSimpleFilter = pokemonList.results;
-      setFilteredPokemon(pokemonWithSimpleFilter);
-
-      // 最初のポケモンを自動選択
-      if (pokemonWithSimpleFilter.length > 0 && !selectedPokemon) {
-        handlePokemonSelect(pokemonWithSimpleFilter[0].url);
-      }
-    }
-  }, [pokemonList, selectedPokemon, handlePokemonSelect]);
 
   // TODO: 実装課題4 - 高度な検索フィルタリング
   // 日本語・英語名での部分一致検索機能を実装
   useEffect(() => {
-    // ここに検索フィルタリング処理を実装
-    // allLoadedPokemonとsearchTermを使った高度なフィルタリング
+    if (allLoadedPokemon.length > 0) {
+      const filtered = searchTerm
+        ? allLoadedPokemon.filter(pokemon => {
+            const englishMatch = pokemon.name.toLowerCase().includes(searchTerm.toLowerCase());
+            const japaneseMatch = pokemon.japaneseName?.toLowerCase().includes(searchTerm.toLowerCase());
+            return englishMatch || japaneseMatch;
+          })
+        : allLoadedPokemon;
+
+      setFilteredPokemon(filtered);
+
+      // 最初のポケモンを自動選択（検索結果がある場合）
+      if (filtered.length > 0 && !selectedPokemon) {
+        handlePokemonSelect(filtered[0].url);
+      }
+    }
   }, [allLoadedPokemon, searchTerm, selectedPokemon, handlePokemonSelect]);
 
   // TODO: 実装課題1 - ポケモン一覧の取得と追加読み込み
@@ -88,16 +86,40 @@ export function ModernPokedex() {
   // 以下の2つの関数を実装してください：
   // 1. loadPokemonList: 初期表示時に24件のポケモンを取得
   // 2. loadMorePokemon: 「もっと見る」ボタンで追加24件を取得
+  // TODO: 実装課題1 - ポケモン一覧の初期取得
   const loadPokemonList = async () => {
-    // 初期ロード処理をここに実装
+    try {
+      setLoading(true);
+      const data = await pokemonService.getPokemonList(24, 0); // 適切な数のポケモンを読み込み
+      setPokemonList(data);
+    } catch (error) {
+      console.error('ポケモンリストの取得に失敗しました:!!!!', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleInfoClick = () => {
     setIsDetailModalOpen(true);
   };
 
+  // TODO: 実装課題1 - 追加読み込み処理
   const loadMorePokemon = async () => {
-    // 追加読み込み処理をここに実装
+    if (!pokemonList) return;
+
+    try {
+      setLoading(true);
+      const currentCount = pokemonList.results.length;
+      const newData = await pokemonService.getPokemonList(24, currentCount);
+      setPokemonList(prevList => ({
+        ...newData,
+        results: [...(prevList?.results || []), ...newData.results]
+      }));
+    } catch (error) {
+      console.error('追加ポケモンの取得に失敗しました:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -169,8 +191,22 @@ export function ModernPokedex() {
                   ))}
 
                   {/* TODO: 実装課題1 - もっと見るボタンUI */}
-                  {/* 「もっと見る」ボタンのUIを実装 */}
-                  {/* 要件: 151匹未満の場合のみ表示、ローディング中は無効化 */}
+                  <div className="text-center pt-4">
+                      <Button
+                        onClick={loadMorePokemon}
+                        disabled={loading}
+                        className="bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-300"
+                      >
+                        {loading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                            読み込み中...
+                          </>
+                        ) : (
+                          'もっと見る'
+                        )}
+                      </Button>
+                    </div>
                 </>
               )}
 

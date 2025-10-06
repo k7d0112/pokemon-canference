@@ -4,14 +4,15 @@
 
 ```
 ポケモン図鑑アプリの基本的な一覧表示機能を実装してください。
-この課題を完了すると、基本的なポケモン図鑑として動作するようになります。
+現在、ページにアクセスしても何も表示されない状態です。この課題を完了すると、ポケモンリストが表示されて基本的なポケモン図鑑として動作するようになります。
 
 ## 実装場所
 - ファイル: src/app/page.tsx
 - 実装箇所:
   1. loadPokemonList関数（初期読み込み）
   2. loadMorePokemon関数（追加読み込み）
-  3. 「もっと見る」ボタンUI
+  3. 基本フィルタリング処理（useEffect）
+  4. 「もっと見る」ボタンUI
 
 ## 機能要件
 1. アプリ起動時に自動的に最初の24件のポケモンを取得して一覧表示
@@ -130,6 +131,29 @@
 - onClick={loadMorePokemon}でクリック時の処理を設定
 - disabled={loading}でローディング中はボタンを無効化
 - 条件分岐でローディング状態に応じた表示を切り替え
+
+### Part 4: 基本フィルタリング処理（useEffect）
+
+#### 処理要件
+取得したポケモンリストを表示用に準備し、最初のポケモンを自動選択します。
+
+#### 実装手順
+1. **条件確認**
+   - if (pokemonList && pokemonList.results.length > 0) で前提条件をチェック
+   - データがない場合は何もしない
+
+2. **表示用リストの作成**
+   - pokemonList.results をそのまま filteredPokemon として設定
+   - setFilteredPokemon(pokemonList.results) で状態を更新
+
+3. **自動選択処理**
+   - 最初のポケモンを自動選択してハイライト表示
+   - pokemonList.results[0].url を selectedPokemonUrl に設定
+   - setSelectedPokemonUrl(pokemonList.results[0].url) を実行
+
+**重要なポイント:**
+- この処理により、リストが表示され、最初のアイテムがハイライトされる
+- 後の実装課題3で詳細取得処理が追加される
 
 ## 使用する要素の説明
 - **pokemonService**: APIとの通信を行うサービス（既に用意済み）
